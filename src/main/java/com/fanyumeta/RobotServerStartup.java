@@ -5,6 +5,7 @@ import org.springframework.boot.Banner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.ApplicationContext;
+import org.springframework.core.env.Environment;
 
 @SpringBootApplication
 public class RobotServerStartup {
@@ -41,13 +42,22 @@ public class RobotServerStartup {
 //            startup(args);
 //        }
         startup(args);
+//        try {
+//            HardwareControlCommandUtil.generateCommandReceiveCacheFile("src/main/resources/数智人问答指令集0123.xlsx", "ReceiveCommandCache");
+//            HardwareControlCommandUtil.generateCommandCacheFile("src/main/resources/中控指令集.xlsx", "RequestCommandCache");
+//        } catch (IOException e) {
+//            throw new RuntimeException(e);
+//        }
     }
 
     private static void startup(String[] args) {
         SpringApplication springApplication = new SpringApplication(RobotServerStartup.class);
         springApplication.setBannerMode(Banner.Mode.OFF);
         ApplicationContext ctx = springApplication.run(args);
-        HardwareControlCommandUtil.initCache(ctx.getEnvironment().getProperty("fan-yu.hardware-control.config-file"));
+        Environment environment = ctx.getEnvironment();
+        HardwareControlCommandUtil.initCache(
+                environment.getProperty("fan-yu.hardware-control.request-command-config-file"),
+                environment.getProperty("fan-yu.hardware-control.receive-command-config-file"));
     }
 //
 //

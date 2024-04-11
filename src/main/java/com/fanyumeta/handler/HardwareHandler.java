@@ -1,5 +1,6 @@
 package com.fanyumeta.handler;
 
+import com.fanyumeta.utils.HardwareControlCommandUtil;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
@@ -18,7 +19,7 @@ public class HardwareHandler extends SimpleChannelInboundHandler<Object> {
         if (msg instanceof ByteBuf) {
             ByteBuf message = (ByteBuf) msg;
             String str = message.toString(CharsetUtil.UTF_8);
-            log.info("接收到的【处理后】消息：{}", str);
+            log.info("接收到的【处理后】消息：{}, 对应的描述：{}", str, HardwareControlCommandUtil.getReceiveCommandDescription(str));
         }
     }
 }
