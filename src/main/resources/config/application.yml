@@ -1,0 +1,13 @@
+server:
+  port: 10000
+spring:
+  application:
+    name: robot-server
+logging:
+  config: classpath:config/logback.xml
+fan-yu:
+  hardware-control:
+    host: 192.168.1.22
+    port: 8080
+    timeout: 2
+    config-file: E:/monkey/product/config/DataCache
