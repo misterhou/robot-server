@@ -43,8 +43,10 @@ public class RobotServerStartup {
 //        }
         startup(args);
 //        try {
-//            HardwareControlCommandUtil.generateReceiveCommandCacheFile("src/main/resources/数智人问答指令集0123.xlsx", "ReceiveCommandCache");
-//            HardwareControlCommandUtil.generateRequestCommandCacheFile("src/main/resources/中控指令集.xlsx", "RequestCommandCache");
+//            HardwareControlCommandUtil.generateReceiveCommandCacheFile("src/main/resources/数智人问答指令集0123.xlsx",
+//            "ReceiveCommandCache");
+//            HardwareControlCommandUtil.generateRequestCommandCacheFile("src/main/resources/中控指令集.xlsx",
+//            "RequestCommandCache");
 //        } catch (Exception e) {
 //            throw new RuntimeException(e);
 //        }
