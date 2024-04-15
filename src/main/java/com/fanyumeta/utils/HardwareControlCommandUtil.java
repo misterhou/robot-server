@@ -32,6 +32,7 @@ public class HardwareControlCommandUtil {
 
     /**
      * 解析文本中的指令
+     *
      * @param message 文本信息
      * @return 指令集合
      */
@@ -48,6 +49,7 @@ public class HardwareControlCommandUtil {
 
     /**
      * 获取响应指令描述
+     *
      * @param commandValue 响应指令
      * @return 响应指令描述
      */
@@ -57,6 +59,7 @@ public class HardwareControlCommandUtil {
 
     /**
      * 通过解析 excel 文件，生成指令缓存文件
+     *
      * @param excelFile excel 文件
      * @param commandCacheFile 缓存文件
      */
@@ -67,7 +70,8 @@ public class HardwareControlCommandUtil {
         int maxCommandDescriptionColumnLength = 4;
         boolean isContainCurrentColumn = false;
 
-        List<Command> data = getCommandInfo(excelFile, sheetIndex, targetColumnData, commandDescriptionColumnOffset, maxCommandDescriptionColumnLength, isContainCurrentColumn);
+        List<Command> data = getCommandInfo(excelFile, sheetIndex, targetColumnData, commandDescriptionColumnOffset,
+                maxCommandDescriptionColumnLength, isContainCurrentColumn);
         Map<String, String> cache = new HashMap<>();
         for (Command command : data) {
             String value = command.getValue();
@@ -80,13 +84,14 @@ public class HardwareControlCommandUtil {
 
     /**
      * 加载指令文件
+     *
      * @param commandCacheFile 缓存文件
      * @return 缓存 map
      * @throws IOException 配置文件读取出错，会抛出此异常
      * @throws ClassNotFoundException 配置文件数据有问题，会抛出此异常
      */
-    public static Map<String,String> loadData(String commandCacheFile) throws IOException, ClassNotFoundException {
-        Map<String,String> data = null;
+    public static Map<String, String> loadData(String commandCacheFile) throws IOException, ClassNotFoundException {
+        Map<String, String> data = null;
         log.info("开始加载指令缓存文件：{}", commandCacheFile);
         ObjectInputStream inputStream = new ObjectInputStream(Files.newInputStream(Paths.get(commandCacheFile)));
         data = (Map<String, String>) inputStream.readObject();
@@ -96,6 +101,7 @@ public class HardwareControlCommandUtil {
 
     /**
      * 更新指令缓存数据
+     *
      * @param requestCommandConfigFile 请求指令文件
      * @param receiveCommandConfigFile 接收指令文件
      */
@@ -112,6 +118,7 @@ public class HardwareControlCommandUtil {
 
     /**
      * 通过解析 excel 文件，生成指令缓存文件
+     *
      * @param excelFile excel 文件
      * @param commandCacheFile 缓存文件
      * @throws IOException 解析配置文件出错，会抛出此异常
@@ -123,7 +130,8 @@ public class HardwareControlCommandUtil {
         int maxCommandDescriptionColumnLength = 3;
         boolean isContainCurrentColumn = false;
 
-        List<Command> data = getCommandInfo(excelFile, sheetIndex, targetColumnData, commandDescriptionColumnOffset, maxCommandDescriptionColumnLength, isContainCurrentColumn);
+        List<Command> data = getCommandInfo(excelFile, sheetIndex, targetColumnData, commandDescriptionColumnOffset,
+                maxCommandDescriptionColumnLength, isContainCurrentColumn);
         Map<String, String> cache = new HashMap<>();
         for (Command command : data) {
             String value = command.getValue();
@@ -138,6 +146,7 @@ public class HardwareControlCommandUtil {
     /**
      * 获取指令信息
      * <p>指令解析是与到空白列会自动终止</p>
+     *
      * @param excelFile 指令存放 excel 文件
      * @param sheetIndex 指令所在 sheet 索引，从 0 开始
      * @param targetColumnData 目标列数据
@@ -147,7 +156,9 @@ public class HardwareControlCommandUtil {
      * @return 指令信息
      * @throws IOException 指令数据读取出错时，会抛出此异常
      */
-    private static List<Command> getCommandInfo(String excelFile, Integer sheetIndex, String targetColumnData, Integer commandDesColumnOffset, Integer commandDesColumnLength, Boolean isContainCurrentColumn) throws IOException {
+    private static List<Command> getCommandInfo(String excelFile, Integer sheetIndex, String targetColumnData,
+                                                Integer commandDesColumnOffset, Integer commandDesColumnLength,
+                                                Boolean isContainCurrentColumn) throws IOException {
         List<Command> data = new ArrayList<>();
         FileInputStream fis = new FileInputStream(excelFile);
         Workbook workbook = WorkbookFactory.create(fis);
@@ -159,18 +170,20 @@ public class HardwareControlCommandUtil {
                     int startRowNum = cell.getRowIndex();
                     int startCellNum = cell.getColumnIndex();
                     log.info(targetColumnData + " row: " + startRowNum + ", column: " + startCellNum);
-                    for (int i = (startRowNum+1); i <= sheet.getLastRowNum(); i ++) {
+                    for (int i = (startRowNum + 1); i <= sheet.getLastRowNum(); i++) {
                         Row commandRow = sheet.getRow(i);
                         Cell commandColumn = commandRow.getCell(startCellNum);
                         if (!StringUtils.hasText(commandColumn.toString())) {
-                            log.warn("遇到空白数据列，退出（row：{}，column：{}）", commandColumn.getRowIndex(), commandColumn.getColumnIndex());
+                            log.warn("遇到空白数据列，退出（row：{}，column：{}）", commandColumn.getRowIndex(),
+                                    commandColumn.getColumnIndex());
                             break;
                         }
                         int commandValueColumnIndex = commandColumn.getColumnIndex();
                         String command = getColumnValue(sheet, i, commandValueColumnIndex, i);
                         // 去除小数
                         command = command.replaceFirst("\\.\\d*", "");
-                        List<String> commandDescription = getCommandDescription(commandColumn, sheet, commandDesColumnOffset, commandDesColumnLength, isContainCurrentColumn);
+                        List<String> commandDescription = getCommandDescription(commandColumn, sheet,
+                                commandDesColumnOffset, commandDesColumnLength, isContainCurrentColumn);
                         data.add(new Command(command, commandDescription));
                         System.out.println("rowIndex: " + i + " - 指令描述：" + commandDescription + "， 指令值：" + command);
                     }
@@ -185,11 +198,13 @@ public class HardwareControlCommandUtil {
     /**
      * 获取反馈指令描述
      * <p>指令描述在 excel 文件中分多列存储，需要分别提取</p>
+     *
      * @param commandCell 指令所在 Cell
      * @param sheet 工作簿
      * @return 指令描述集合
      */
-    private static List<String> getCommandDescription(Cell commandCell, Sheet sheet, Integer startOffset, Integer maxColumnNum, Boolean isContainThis) {
+    private static List<String> getCommandDescription(Cell commandCell, Sheet sheet, Integer startOffset,
+                                                      Integer maxColumnNum, Boolean isContainThis) {
         List<String> commandDes = new ArrayList<>();
         if (isContainThis) {
             commandDes.add(commandCell.toString());
@@ -211,6 +226,7 @@ public class HardwareControlCommandUtil {
 
     /**
      * 获取指令存入 map 中的 key
+     *
      * @param commandList 指令名称集合
      * @return 指令名称集合对应的 key
      */
@@ -234,6 +250,7 @@ public class HardwareControlCommandUtil {
 
     /**
      * 获取单元格中的数据（字符串形式）
+     *
      * @param sheet 工作表
      * @param rowIndex 行索引
      * @param columnIndex 列索引
@@ -255,6 +272,7 @@ public class HardwareControlCommandUtil {
 
     /**
      * 将对象写入文件
+     *
      * @param obj 待写入的对象
      * @param file 待写入的文件
      * @throws IOException 将对象写入文件报错时，会抛出此异常
