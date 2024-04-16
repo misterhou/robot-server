@@ -12,3 +12,5 @@ fan-yu:
     timeout: 2
     request-command-config-file: E:/monkey/product/config/RequestCommandCache
     receive-command-config-file: E:/monkey/product/config/ReceiveCommandCache
+  large-model:
+    url: http://192.168.1.14:8017/add
