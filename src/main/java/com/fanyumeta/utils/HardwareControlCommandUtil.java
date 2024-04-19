@@ -31,6 +31,41 @@ public class HardwareControlCommandUtil {
     private static final Map<String, String> RECEIVE_COMMAND_CACHE = new HashMap<>(256);
 
     /**
+     * 需要忽略的描述
+     */
+    private static final List<String> IGNORE_DESCRIPTION = Arrays.asList("大屏前空调", "1号", "2号", "参观台1区空调", "参观台2区空调",
+            "合二为一");
+
+    private static final Map<String, String> REPLACE_DESCRIPTION = new HashMap<>();
+
+
+    static {
+        REPLACE_DESCRIPTION.put("18", "(18|十八)");
+        REPLACE_DESCRIPTION.put("19", "(19|十九)");
+        REPLACE_DESCRIPTION.put("20", "(20|二十)");
+        REPLACE_DESCRIPTION.put("21", "(21|二十一)");
+        REPLACE_DESCRIPTION.put("22", "(22|二十二)");
+        REPLACE_DESCRIPTION.put("23", "(23|二十三)");
+        REPLACE_DESCRIPTION.put("24", "(24|二十四)");
+        REPLACE_DESCRIPTION.put("25", "(25|二十五)");
+        REPLACE_DESCRIPTION.put("26", "(26|二十六)");
+        REPLACE_DESCRIPTION.put("27", "(27|二十七)");
+        REPLACE_DESCRIPTION.put("28", "(28|二十八)");
+        REPLACE_DESCRIPTION.put("29", "(29|二十九)");
+        REPLACE_DESCRIPTION.put("30", "(30|三十)");
+
+        REPLACE_DESCRIPTION.put("1", "(1|一)");
+        REPLACE_DESCRIPTION.put("2", "(2|二)");
+        REPLACE_DESCRIPTION.put("3", "(3|三)");
+        REPLACE_DESCRIPTION.put("4", "(4|四)");
+        REPLACE_DESCRIPTION.put("5", "(5|五)");
+        REPLACE_DESCRIPTION.put("6", "(6|六)");
+        REPLACE_DESCRIPTION.put("7", "(7|七)");
+        REPLACE_DESCRIPTION.put("8", "(8|八)");
+        REPLACE_DESCRIPTION.put("9", "(9|九)");
+    }
+
+    /**
      * 解析文本中的指令
      *
      * @param message 文本信息
@@ -79,6 +114,7 @@ public class HardwareControlCommandUtil {
             String commandKey = getCommandKey(description);
             cache.put(commandKey, value);
         }
+        System.out.println(cache);
         writeObject2File(cache, commandCacheFile);
     }
 
@@ -215,8 +251,19 @@ public class HardwareControlCommandUtil {
             if (!StringUtils.hasText(cellValue)) {
                 break;
             }
+
+            if (StringUtils.hasText(cellValue) & !isDouble(cellValue)) {
+                for (String key : REPLACE_DESCRIPTION.keySet()) {
+                    if (cellValue.contains(key)) {
+                        cellValue = cellValue.replace(key, REPLACE_DESCRIPTION.get(key));
+                        break;
+                    }
+                }
+            }
+
             // 判读指令名称是否重复，重复则丢弃
-            if (!commandDes.stream().anyMatch(e -> e.contains(cellValue))) {
+            final String finalCellValue = cellValue;
+            if (!commandDes.stream().anyMatch(e -> e.contains(finalCellValue))) {
                 commandDes.add(cellValue);
             }
             startOffset--;
@@ -264,7 +311,9 @@ public class HardwareControlCommandUtil {
         Row row = sheet.getRow(rowIndex);
         Cell cell = row.getCell(columnIndex);
         String cellValue = cell.toString();
-        if (!StringUtils.hasText(cellValue) && rowIndex > minRowIndex) {
+        if (IGNORE_DESCRIPTION.contains(cellValue)) {
+            cellValue = "";
+        } else if (!StringUtils.hasText(cellValue) && rowIndex > minRowIndex) {
             cellValue = getColumnValue(sheet, (rowIndex - 1), columnIndex, minRowIndex);
         }
         return cellValue;
@@ -282,6 +331,21 @@ public class HardwareControlCommandUtil {
         ObjectOutputStream outputStream = new ObjectOutputStream(fileOutputStream);
         outputStream.writeObject(obj);
         outputStream.close();
+    }
+
+    /**
+     * 判断字符串是否为数字
+     *
+     * @param str 字符串
+     * @return true：是数字，false：不是数字
+     */
+    private static Boolean isDouble(String str) {
+        try {
+            Double.parseDouble(str);
+            return true;
+        } catch (NumberFormatException e) {
+            return false;
+        }
     }
 
     /**
